@@ -67,6 +67,15 @@ const starterItems = [
     radius: 18,
     locked: false,
     rotation: 0,
+    color: '#0f172a',
+    fontSize: 28,
+    fontFamily: 'Space Grotesk',
+    backgroundColor: '#ffffff',
+    backgroundOpacity: 0.85,
+    borderWidth: 0,
+    borderColor: '#e2e8f0',
+    padding: 12,
+    align: 'left',
   },
 ]
 
@@ -112,6 +121,14 @@ const filters = [
   { id: 'cool', label: 'Cool', value: 'hue-rotate(190deg) saturate(1.1)' },
 ]
 
+const fonts = [
+  'Space Grotesk',
+  'Playfair Display',
+  'Archivo',
+  'DM Sans',
+  'Bebas Neue',
+]
+
 const formats = [
   {
     id: 'ig-portrait',
@@ -128,6 +145,39 @@ const formats = [
     height: 1920,
   },
 ]
+
+const layoutTemplates = {
+  classic: [
+    { x: 6, y: 6, w: 42, h: 38 },
+    { x: 52, y: 6, w: 42, h: 26 },
+    { x: 52, y: 36, w: 42, h: 38 },
+  ],
+  story: [
+    { x: 10, y: 6, w: 80, h: 30 },
+    { x: 10, y: 40, w: 80, h: 30 },
+    { x: 10, y: 74, w: 80, h: 20 },
+  ],
+  editorial: [
+    { x: 6, y: 10, w: 54, h: 60 },
+    { x: 62, y: 10, w: 32, h: 32 },
+    { x: 62, y: 46, w: 32, h: 24 },
+  ],
+  polaroid: [
+    { x: 8, y: 10, w: 46, h: 48 },
+    { x: 52, y: 22, w: 40, h: 44 },
+    { x: 16, y: 64, w: 36, h: 26 },
+  ],
+}
+
+const hexToRgba = (hex, alpha = 1) => {
+  const value = hex.replace('#', '')
+  const bigint = parseInt(value, 16)
+  if (Number.isNaN(bigint)) return `rgba(0,0,0,${alpha})`
+  const r = (bigint >> 16) & 255
+  const g = (bigint >> 8) & 255
+  const b = bigint & 255
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 const starterClips = [
   { id: 'clip-1', label: 'Intro', duration: 3 },
@@ -184,6 +234,15 @@ function App() {
         radius: 18,
         locked: false,
         rotation: 0,
+        color: '#0f172a',
+        fontSize: 28,
+        fontFamily: 'Space Grotesk',
+        backgroundColor: '#ffffff',
+        backgroundOpacity: 0.85,
+        borderWidth: 0,
+        borderColor: '#e2e8f0',
+        padding: 12,
+        align: 'left',
       },
     ])
     setSelectedId(nextId)
@@ -517,6 +576,29 @@ function App() {
     updateSelected({ filter: filterValue })
   }
 
+  const applyLayout = (layoutId) => {
+    const template = layoutTemplates[layoutId]
+    if (!template) return
+    const imageItems = items.filter((item) => item.type === 'image')
+    const textItems = items.filter((item) => item.type === 'text')
+    setItems((current) =>
+      current.map((item) => {
+        if (item.type === 'image') {
+          const index = imageItems.findIndex((img) => img.id === item.id)
+          const next = template[index % template.length]
+          return next ? { ...item, ...next } : item
+        }
+        if (item.type === 'text' && layoutId === 'editorial') {
+          return { ...item, x: 6, y: 74, w: 88, h: 18 }
+        }
+        if (item.type === 'text' && layoutId === 'story') {
+          return { ...item, x: 10, y: 6, w: 80, h: 18 }
+        }
+        return item
+      })
+    )
+  }
+
   const addClip = () => {
     const nextId = `clip-${Date.now()}`
     setClips((current) => [
@@ -554,7 +636,7 @@ function App() {
   }, [selectedItem])
 
   return (
-    <div className="app">
+    <div className={`app ${mode === 'video' ? 'mode-video' : 'mode-image'}`}>
       <header className="topbar">
         <div className="brand">
           <div className="brand-mark">IC</div>
@@ -643,20 +725,36 @@ function App() {
             </div>
           </section>
 
-          <section>
-            <p className="panel-title">Layouts</p>
-            <div className="preset-list">
-              {presets.map((preset) => (
-                <button key={preset.id} className="preset">
-                  <div>
-                    <p>{preset.name}</p>
-                    <span>{preset.note}</span>
-                  </div>
-                  <span>Apply</span>
-                </button>
-              ))}
-            </div>
-          </section>
+          {mode === 'image' ? (
+            <section>
+              <p className="panel-title">Layouts</p>
+              <div className="preset-list">
+                {presets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    className="preset"
+                    onClick={() => applyLayout(preset.id)}
+                  >
+                    <div>
+                      <p>{preset.name}</p>
+                      <span>{preset.note}</span>
+                    </div>
+                    <span>Apply</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <section>
+              <p className="panel-title">Video tools</p>
+              <div className="tool-grid">
+                <button onClick={addClip}>Add clip</button>
+                <button disabled>Audio (soon)</button>
+                <button disabled>Transitions (soon)</button>
+                <button disabled>Captions (soon)</button>
+              </div>
+            </section>
+          )}
 
           <section>
             <p className="panel-title">Quick tools</p>
@@ -726,6 +824,11 @@ function App() {
               aspectRatio: activeFormat.ratio,
             }}
           >
+            {mode === 'video' && (
+              <div className="video-badge">
+                Video preview mode • {activeFormat.name}
+              </div>
+            )}
             <div className="canvas-grid" />
             {items.map((item) => (
               <button
@@ -777,7 +880,25 @@ function App() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-placeholder">{item.text}</div>
+                  <div
+                    className="text-placeholder"
+                    style={{
+                      color: item.color ?? '#0f172a',
+                      fontSize: `${item.fontSize ?? 28}px`,
+                      fontFamily: item.fontFamily ?? 'Space Grotesk',
+                      backgroundColor: hexToRgba(
+                        item.backgroundColor ?? '#ffffff',
+                        item.backgroundOpacity ?? 0.85
+                      ),
+                      border: `${item.borderWidth ?? 0}px solid ${
+                        item.borderColor ?? '#e2e8f0'
+                      }`,
+                      padding: `${item.padding ?? 12}px`,
+                      textAlign: item.align ?? 'left',
+                    }}
+                  >
+                    {item.text}
+                  </div>
                 )}
               </button>
             ))}
@@ -874,16 +995,135 @@ function App() {
                   </p>
                 </div>
                 {selectedItem.type === 'text' ? (
-                  <label className="field">
-                    <span>Text</span>
-                    <input
-                      type="text"
-                      value={selectedItem.text}
-                      onChange={(event) =>
-                        updateSelected({ text: event.target.value })
-                      }
-                    />
-                  </label>
+                  <>
+                    <label className="field">
+                      <span>Text</span>
+                      <input
+                        type="text"
+                        value={selectedItem.text}
+                        onChange={(event) =>
+                          updateSelected({ text: event.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="field">
+                      <span>Font</span>
+                      <select
+                        value={selectedItem.fontFamily ?? 'Space Grotesk'}
+                        onChange={(event) =>
+                          updateSelected({ fontFamily: event.target.value })
+                        }
+                      >
+                        {fonts.map((font) => (
+                          <option key={font} value={font}>
+                            {font}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="field">
+                      <span>Font size</span>
+                      <input
+                        type="range"
+                        min="14"
+                        max="64"
+                        value={selectedItem.fontSize ?? 28}
+                        onChange={(event) =>
+                          updateSelected({ fontSize: Number(event.target.value) })
+                        }
+                      />
+                    </label>
+                    <div className="field-row">
+                      <label className="field">
+                        <span>Text color</span>
+                        <input
+                          type="color"
+                          value={selectedItem.color ?? '#0f172a'}
+                          onChange={(event) =>
+                            updateSelected({ color: event.target.value })
+                          }
+                        />
+                      </label>
+                      <label className="field">
+                        <span>Alignment</span>
+                        <select
+                          value={selectedItem.align ?? 'left'}
+                          onChange={(event) =>
+                            updateSelected({ align: event.target.value })
+                          }
+                        >
+                          <option value="left">Left</option>
+                          <option value="center">Center</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="field-row">
+                      <label className="field">
+                        <span>Background</span>
+                        <input
+                          type="color"
+                          value={selectedItem.backgroundColor ?? '#ffffff'}
+                          onChange={(event) =>
+                            updateSelected({ backgroundColor: event.target.value })
+                          }
+                        />
+                      </label>
+                      <label className="field">
+                        <span>Opacity</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={selectedItem.backgroundOpacity ?? 0.85}
+                          onChange={(event) =>
+                            updateSelected({
+                              backgroundOpacity: Number(event.target.value),
+                            })
+                          }
+                        />
+                      </label>
+                    </div>
+                    <div className="field-row">
+                      <label className="field">
+                        <span>Border width</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="6"
+                          value={selectedItem.borderWidth ?? 0}
+                          onChange={(event) =>
+                            updateSelected({
+                              borderWidth: Number(event.target.value),
+                            })
+                          }
+                        />
+                      </label>
+                      <label className="field">
+                        <span>Border color</span>
+                        <input
+                          type="color"
+                          value={selectedItem.borderColor ?? '#e2e8f0'}
+                          onChange={(event) =>
+                            updateSelected({ borderColor: event.target.value })
+                          }
+                        />
+                      </label>
+                    </div>
+                    <label className="field">
+                      <span>Padding</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="32"
+                        value={selectedItem.padding ?? 12}
+                        onChange={(event) =>
+                          updateSelected({ padding: Number(event.target.value) })
+                        }
+                      />
+                    </label>
+                  </>
                 ) : (
                   <label className="field">
                     <span>Caption</span>

@@ -245,6 +245,20 @@
   box-shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
 }
 
+.video-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  background: rgba(15, 23, 42, 0.8);
+  color: #fff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .canvas-grid {
   position: absolute;
   inset: 0;
@@ -319,14 +333,9 @@
 .text-placeholder {
   width: 100%;
   height: 100%;
-  background: #f8fafc;
   display: grid;
   align-items: center;
-  padding: 1rem;
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #0f172a;
-  text-align: left;
+  font-weight: 600;
 }
 
 .canvas-footer {
@@ -453,6 +462,21 @@
   font-size: 0.95rem;
   font-family: inherit;
   background: #fff;
+}
+
+.field select {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
 }
 
 .chips {
