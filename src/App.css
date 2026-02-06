@@ -57,6 +57,27 @@
   flex-wrap: wrap;
 }
 
+.segmented {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 999px;
+  gap: 0.25rem;
+}
+
+.segmented button {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: transparent;
+  font-weight: 600;
+  color: #475569;
+}
+
+.segmented button.active {
+  background: #111827;
+  color: #fff;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) minmax(320px, 2.2fr) minmax(
@@ -146,6 +167,11 @@
   transform: translateY(-2px);
 }
 
+.preset.active {
+  border-color: #111827;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+}
+
 .preset p {
   margin: 0;
   font-weight: 600;
@@ -229,6 +255,15 @@
     linear-gradient(90deg, rgba(226, 232, 240, 0.7) 1px, transparent 1px);
   background-size: 12% 12%;
   pointer-events: none;
+}
+
+.canvas.exporting .canvas-grid {
+  opacity: 0;
+}
+
+.canvas.exporting .canvas-item.active {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .canvas-item {
@@ -321,6 +356,70 @@
   gap: 0.6rem;
 }
 
+.timeline {
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  padding: 1.2rem 1.4rem;
+  display: grid;
+  gap: 1rem;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.timeline-header p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.timeline-header span {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.timeline-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(120px, 1fr);
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+}
+
+.timeline-clip {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem;
+  text-align: left;
+}
+
+.timeline-clip p {
+  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.timeline-clip span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.timeline-clip.active {
+  border-color: #fb7185;
+  box-shadow: 0 12px 24px rgba(251, 113, 133, 0.2);
+}
+
+.timeline-controls {
+  display: grid;
+  gap: 0.8rem;
+}
+
 .inspector {
   display: grid;
   gap: 1rem;
@@ -380,6 +479,31 @@
   border-color: #f97316;
   color: #9a3412;
   background: #ffedd5;
+}
+
+.filter-grid {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-size: 0.8rem;
+}
+
+.filter-chip.active {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
 }
 
 .checklist {
